@@ -11,6 +11,8 @@
   <modules>
     <module>order-api</module>
     <module>order-provider</module>
+      <module>bail-rpc</module>
+    <module>rpc-config</module>
   </modules>
 
   <name>provider</name>
