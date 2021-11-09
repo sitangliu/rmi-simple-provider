@@ -1,7 +1,9 @@
 package org.bl.service.impl;
 
+import org.bl.annotation.BlRemoteService;
 import org.bl.dto.OrderDTO;
 import org.bl.service.IOrderService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
  * @author: ext.liukai3
  * @date: 2021/11/8 15:29
  */
+@BlRemoteService
+//@Service
 public class OrderServiceImpl implements IOrderService {
     @Override
     public String queryOrderList() {

@@ -1,6 +1,6 @@
 package org.bl.server;
 
-import org.bl.handler.ProcessHandler;
+import org.bl.handler.ProcessorHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,7 +30,7 @@ public class RpcProxyServer {
             while (true){
                 System.out.println("等待服务接入...");
                 Socket socket = serverSocket.accept();
-                executorService.execute(new ProcessHandler(socket,service));
+                executorService.execute(new ProcessorHandler(socket));
             }
         }catch (Exception e){
             System.out.println("发布服务失败："+e.getMessage());

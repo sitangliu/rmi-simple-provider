@@ -1,6 +1,7 @@
 package org.bl.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bl.container.Mediator;
 import org.bl.rpc.RpcRequest;
 
 import java.io.*;
@@ -12,7 +13,7 @@ import java.net.Socket;
  * @author: ext.liukai3
  * @date: 2021/11/8 15:39
  */
-public class ProcessHandler implements Runnable{
+public class ProcessorHandler implements Runnable{
 
     /**
      * 网络连接，获取数据
@@ -24,9 +25,8 @@ public class ProcessHandler implements Runnable{
      */
     private Object service;
 
-    public ProcessHandler(Socket socket, Object service) {
+    public ProcessorHandler(Socket socket) {
         this.socket = socket;
-        this.service = service;
     }
 
     @Override
@@ -39,10 +39,14 @@ public class ProcessHandler implements Runnable{
             InputStream inputStream = socket.getInputStream();
             objectInputStream = new ObjectInputStream(inputStream);
             RpcRequest rpcRequest = (RpcRequest)objectInputStream.readObject();//进行对象反序列化
-            Object rs = invoke(rpcRequest);//调用本地服务，对请求数据进行业务处理
+//            Object rs = invoke(rpcRequest);//调用本地服务，对请求数据进行业务处理
+            //此处改为从容器中获取服务实例，并进行调用
+            Mediator mediator = Mediator.getInstance();
+            Object processor = mediator.processor(rpcRequest);
+
             OutputStream outputStream = socket.getOutputStream();
             objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(rs);//对对象进行序列化
+            objectOutputStream.writeObject(processor);//对对象进行序列化
         }catch (Exception e){
             System.err.println("线程处理任务出错："+e.getMessage());
         }finally {
