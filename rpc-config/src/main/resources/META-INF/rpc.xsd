@@ -33,6 +33,17 @@
     <xsd:complexType name="serviceType">
         <xsd:complexContent>
             <xsd:extension base="abstractServiceType">
+                <xsd:attribute name="interface" type="xsd:token" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            <![CDATA[ Defines the interface to advertise for this service in the service registry. ]]></xsd:documentation>
+                        <xsd:appinfo>
+                            <tool:annotation>
+                                <tool:expected-type type="java.lang.Class"/>
+                            </tool:annotation>
+                        </xsd:appinfo>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>

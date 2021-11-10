@@ -1,6 +1,5 @@
 package org.bl.handler;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bl.container.Mediator;
 import org.bl.rpc.RpcRequest;
 

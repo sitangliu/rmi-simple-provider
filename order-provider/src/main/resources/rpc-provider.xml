@@ -3,5 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:rpc="http://com.bail.rpc/schema/rpc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://com.bail.rpc/schema/rpc/rpc.xsd">
-    <rpc:service></rpc:service>
+    <bean id="orderService" class="org.bl.service.impl.OrderServiceImpl"></bean>
+
+    <rpc:service interface="org.bl.service.IOrderService" ref="orderService"></rpc:service>
 </beans>
