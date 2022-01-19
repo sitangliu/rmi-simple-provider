@@ -23,3 +23,4 @@ JDKProxy生成接口对应的代理类
 Dubbo协议发布对应的exporter
     打开服务提供者服务器 openServer（服务监听器）   协议内部会有一个服务器缓存容器，根据服务地址缓存server,不存在server,则create,
         否则进行重置唤醒
+    Dubbo协议注册形式：

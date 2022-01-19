@@ -5,5 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://com.bail.rpc/schema/rpc/rpc.xsd">
     <bean id="orderService" class="org.bl.service.impl.OrderServiceImpl"></bean>
 
+    <rpc:application name="order-provider-application"/>
+    <rpc:registry protocol="zooKeeper" address="127.0.0.1" port="2181" id="zookeeperRegistry"/>
     <rpc:service interface="org.bl.service.IOrderService" ref="orderService"></rpc:service>
+
+
 </beans>
