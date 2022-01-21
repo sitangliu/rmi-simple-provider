@@ -43,6 +43,9 @@ public class ProtocolConfig extends AbstractConfig{
     private String serialization;
 
 
+    // context path
+    private String contextpath;
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -93,5 +96,13 @@ public class ProtocolConfig extends AbstractConfig{
 
     public void setSerialization(String serialization) {
         this.serialization = serialization;
+    }
+
+    public String getContextpath() {
+        return contextpath;
+    }
+
+    public void setContextpath(String contextpath) {
+        this.contextpath = contextpath;
     }
 }
