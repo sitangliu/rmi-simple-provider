@@ -27,6 +27,8 @@ import static com.bail.rpc.config.spring.common.NetUtils.LOCALHOST;
  */
 public class ServiceConfig<T> extends AbstractServiceConfig{
 
+    private T ref;
+
     /**
      * 协议集合
      */
@@ -78,7 +80,11 @@ public class ServiceConfig<T> extends AbstractServiceConfig{
         URL url = new URL(name,host,port,contextPath+"/"+path,map);
 
         //首先发布本地服务
-        exportLocal(url);
+        //exportLocal(url);
+
+
+
+
     }
 
     /**
