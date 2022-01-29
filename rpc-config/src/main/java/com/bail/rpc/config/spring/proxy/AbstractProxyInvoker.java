@@ -1,6 +1,7 @@
 package com.bail.rpc.config.spring.proxy;
 
 import com.bail.rpc.config.spring.common.URL;
+import com.bail.rpc.config.spring.exception.RpcException;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -52,13 +53,13 @@ public abstract class AbstractProxyInvoker<T> implements Invoker<T> {
     }
 
     @Override
-    public Result invoke(Invocation invocation) throws Exception {
+    public Result invoke(Invocation invocation) throws RpcException {
         try {
             return new RpcResult(doInvoke(proxy, invocation.getMethodName(), invocation.getParameterTypes(), invocation.getArguments()));
         } catch (InvocationTargetException e) {
             return new RpcResult(e.getTargetException());
         } catch (Throwable e) {
-            throw new Exception("Failed to invoke remote proxy method " + invocation.getMethodName() + " to " + getUrl() + ", cause: " + e.getMessage(), e);
+            throw new RpcException("Failed to invoke remote proxy method " + invocation.getMethodName() + " to " + getUrl() + ", cause: " + e.getMessage(), e);
         }
     }
 

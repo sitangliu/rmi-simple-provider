@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
- * @Description：create
+ * @Description：invoker的代理类
  * @author: ext.liukai3
  * @date: 2022/1/28 16:51
  */
@@ -32,6 +32,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         if ("equals".equals(methodName) && parameterTypes.length == 1) {
             return invoker.equals(args[0]);
         }
+        //封装的调用对象属性
         return invoker.invoke(new RpcInvocation(method,args));
     }
 }

@@ -4,11 +4,15 @@ import com.bail.rpc.config.spring.common.Constants;
 import com.bail.rpc.config.spring.common.StringUtils;
 import com.bail.rpc.config.spring.common.URL;
 import com.bail.rpc.config.spring.common.UrlUtils;
-import com.bail.rpc.config.spring.common.NetUtils;
-import com.bail.rpc.config.spring.po.ApplicationConfig;
+import com.bail.rpc.config.spring.exporter.Exporter;
 import com.bail.rpc.config.spring.po.ProtocolConfig;
 import com.bail.rpc.config.spring.po.RegistryConfig;
 import com.bail.rpc.config.spring.protocol.Protocol;
+import com.bail.rpc.config.spring.proxy.DelegateProviderMetaDataInvoker;
+import com.bail.rpc.config.spring.proxy.Invoker;
+import com.bail.rpc.config.spring.proxy.JdkProxyFactory;
+import com.bail.rpc.config.spring.proxy.ProxyFactory;
+import com.bail.rpc.config.spring.registry.RegistryProtocol;
 import com.bail.rpc.config.spring.registry.RegistryService;
 
 import java.lang.reflect.Method;
@@ -28,6 +32,12 @@ import static com.bail.rpc.config.spring.common.NetUtils.LOCALHOST;
 public class ServiceConfig<T> extends AbstractServiceConfig{
 
     private T ref;
+
+    private Class<?> interfaceClass;
+
+    private ProxyFactory proxyFactory = new JdkProxyFactory();
+
+    private Protocol registryProtocol = new RegistryProtocol();
 
     /**
      * 协议集合
@@ -81,6 +91,21 @@ public class ServiceConfig<T> extends AbstractServiceConfig{
 
         //首先发布本地服务
         //exportLocal(url);
+        try{
+            for(URL registryURL: registryURLs){
+                Invoker invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass,
+                        registryURL.addParameterAndEncoded(Constants.EXPORT_KEY,url.toFullString()));
+
+                DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
+                Exporter exporter= registryProtocol.export(wrapperInvoker);
+
+            }
+
+
+
+        }catch (Exception e){
+
+        }
 
 
 

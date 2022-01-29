@@ -19,13 +19,12 @@ public class JdkProxyFactory implements ProxyFactory{
 
     @Override
     public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) throws Exception {
-
+        final Wrapper wrapper = Wrapper.getWrapper(type);
         return new AbstractProxyInvoker<T>(proxy, type, url) {
             @Override
             protected Object doInvoke(T proxy, String methodName, Class<?>[] parameterTypes, Object[] arguments) throws Throwable {
-
+                return wrapper.invokeMethod(proxy,methodName,parameterTypes,arguments);
             }
-        }
-        return null;
+        };
     }
 }

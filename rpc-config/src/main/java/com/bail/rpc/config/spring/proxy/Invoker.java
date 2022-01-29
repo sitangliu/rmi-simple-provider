@@ -1,6 +1,8 @@
 package com.bail.rpc.config.spring.proxy;
 
 
+import com.bail.rpc.config.spring.exception.RpcException;
+
 /**
  * @Description：调用者
  * @author: ext.liukai3
@@ -20,5 +22,5 @@ public interface Invoker<T> extends Node{
      * @return
      * @throws Exception
      */
-    Object invoke(Invocation invocation) throws Exception;
+    Result invoke(Invocation invocation) throws RpcException;
 }
