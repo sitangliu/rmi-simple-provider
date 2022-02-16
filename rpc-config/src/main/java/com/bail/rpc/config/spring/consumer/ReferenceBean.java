@@ -1,6 +1,5 @@
-package com.bail.rpc.config.spring;
+package com.bail.rpc.config.spring.consumer;
 
-import com.bail.rpc.config.spring.schema.ReferenceConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;

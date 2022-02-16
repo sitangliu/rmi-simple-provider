@@ -11,6 +11,8 @@ import com.bail.rpc.config.spring.proxy.Invoker;
  * @date: 2022/1/21 20:37
  */
 public class BailProtocol implements Protocol{
+    //对外发布通信协议
+
     @Override
     public int getDefaultPort() {
         return 20880;

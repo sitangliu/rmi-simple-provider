@@ -1,11 +1,10 @@
 package com.bail.rpc.config.spring.schema;
 
-import com.bail.rpc.config.spring.ReferenceBean;
+import com.bail.rpc.config.spring.consumer.ReferenceBean;
 import com.bail.rpc.config.spring.ServiceBean;
 import com.bail.rpc.config.spring.po.ApplicationConfig;
 import com.bail.rpc.config.spring.po.ProtocolConfig;
 import com.bail.rpc.config.spring.po.RegistryConfig;
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**

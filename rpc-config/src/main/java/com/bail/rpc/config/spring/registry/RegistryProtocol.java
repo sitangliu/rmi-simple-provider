@@ -10,8 +10,10 @@ import com.bail.rpc.config.spring.protocol.Protocol;
 import com.bail.rpc.config.spring.proxy.Invoker;
 import com.bail.rpc.config.spring.proxy.InvokerWrapper;
 import com.bail.rpc.config.spring.support.ProviderConsumerRegTable;
+import com.bail.rpc.config.spring.zookeeper.CuratorZookeeperTransporter;
+import com.bail.rpc.config.spring.zookeeper.ZookeeperRegistry;
+import com.bail.rpc.config.spring.zookeeper.ZookeeperTransporter;
 
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ public class RegistryProtocol implements Protocol {
 
     private Protocol  bailProtocol= new BailProtocol();
 
-    private Registry registry = new ZookeeperRegistry();
+    private Registry registry;
 
     @Override
     public int getDefaultPort() {
@@ -72,7 +74,9 @@ public class RegistryProtocol implements Protocol {
      * @param registedProviderUrl
      */
     private void register(URL registryUrl, URL registedProviderUrl) {
-
+        CuratorZookeeperTransporter curatorZookeeperTransporter = new CuratorZookeeperTransporter();
+        registry = new ZookeeperRegistry(registryUrl,curatorZookeeperTransporter);
+        registry.register(registedProviderUrl);
     }
 
     private <T> URL getRegistedProviderUrl(Invoker<T> originInvoker) {
@@ -85,7 +89,6 @@ public class RegistryProtocol implements Protocol {
                 .removeParameter(QOS_PORT)
                 .removeParameter(ACCEPT_FOREIGN_IP);
         return registedProviderUrl;
-        return null;
     }
 
     private <T> URL getRegistryUrl(Invoker<T> originInvoker) {

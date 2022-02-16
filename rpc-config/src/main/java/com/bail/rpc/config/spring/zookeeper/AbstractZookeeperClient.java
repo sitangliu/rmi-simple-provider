@@ -5,15 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @Description：create
  * @author: ext.liukai3
  * @date: 2022/2/15 18:04
  */
-public class AbstractZookeeperClient implements ZookeeperClient{
+public class AbstractZookeeperClient<T> implements ZookeeperClient{
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractZookeeperClient.class);
+
+    private final Set<StateListener> stateListeners = new CopyOnWriteArraySet<StateListener>();
 
     private final URL url;
 
@@ -49,5 +53,15 @@ public class AbstractZookeeperClient implements ZookeeperClient{
     @Override
     public URL getUrl() {
         return null;
+    }
+
+    protected void stateChanged(int state) {
+        for (StateListener sessionListener : getSessionListeners()) {
+            sessionListener.stateChanged(state);
+        }
+    }
+
+    public Set<StateListener> getSessionListeners() {
+        return stateListeners;
     }
 }

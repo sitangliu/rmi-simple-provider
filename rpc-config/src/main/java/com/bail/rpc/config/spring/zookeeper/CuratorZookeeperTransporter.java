@@ -1,7 +1,7 @@
 package com.bail.rpc.config.spring.zookeeper;
 
 import com.bail.rpc.config.spring.common.URL;
-import org.apache.curator.CuratorZookeeperClient;
+
 
 /**
  * @Description：传输者
