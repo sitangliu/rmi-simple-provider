@@ -1,5 +1,6 @@
 package com.bail.rpc.config.spring.wrapper;
 
+import com.bail.rpc.config.spring.common.StringUtils;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;

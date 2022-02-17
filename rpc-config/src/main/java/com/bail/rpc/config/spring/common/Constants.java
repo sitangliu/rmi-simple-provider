@@ -155,7 +155,7 @@ public class Constants {
 
     public static final String CONSUMER_SIDE = "consumer";
 
-    public static final String DEFAULT_REGISTRY = "dubbo";
+    public static final String DEFAULT_REGISTRY = "bail";
 
     public static final String BACKUP_KEY = "backup";
 

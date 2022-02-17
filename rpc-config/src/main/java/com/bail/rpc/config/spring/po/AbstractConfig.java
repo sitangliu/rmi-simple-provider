@@ -1,6 +1,8 @@
 package com.bail.rpc.config.spring.po;
 
+import com.bail.rpc.config.spring.common.Constants;
 import com.bail.rpc.config.spring.common.StringUtils;
+import com.bail.rpc.config.spring.common.URL;
 import com.bail.rpc.config.spring.consumer.ConfigUtils;
 import com.bail.rpc.config.spring.consumer.ConsumerConfig;
 import org.slf4j.Logger;
@@ -40,6 +42,55 @@ public class AbstractConfig implements Serializable {
         this.id = id;
     }
 
+    protected void appendParameters(Map<String, String> parameters, Object config) {
+        appendParameters(parameters,config,null);
+    }
+
+    protected void appendParameters(Map<String, String> parameters, Object config, String prefix) {
+        if (config == null) {
+            return;
+        }
+        //根据方法获取需要拼接的参数
+        Method[] methods = config.getClass().getMethods();
+        for (Method method : methods) {
+            try {
+                String name = method.getName();
+                if ((name.startsWith("get") || name.startsWith("is"))
+                        && !"getClass".equals(name)
+                        && Modifier.isPublic(method.getModifiers())
+                        && method.getParameterTypes().length == 0
+                        && isPrimitive(method.getReturnType())){
+                    int i = name.startsWith("get") ? 3 : 2;
+                    String prop = StringUtils.camelToSplitName(name.substring(i, i + 1).toLowerCase() + name.substring(i + 1), ".");
+                    String key = prop;
+
+                    Object value = method.invoke(config, new Object[0]);
+                    String str = String.valueOf(value).trim();
+                    if (value != null && str.length() > 0) {
+                        if (prefix != null && prefix.length() > 0) {
+                            key = prefix + "." + key;
+                        }
+                        parameters.put(key, str);
+                    }
+                }else if("getParameters".equals(name)
+                        && Modifier.isPublic(method.getModifiers())
+                        && method.getParameterTypes().length == 0
+                        && method.getReturnType() == Map.class){
+                    Map<String, String> map = (Map<String, String>) method.invoke(config, new Object[0]);
+                    if (map != null && map.size() > 0) {
+                        String pre = (prefix != null && prefix.length() > 0 ? prefix + "." : "");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            parameters.put(pre + entry.getKey().replace('-', '.'), entry.getValue());
+                        }
+                    }
+                }
+            }catch (Exception e){
+
+            }
+
+
+        }
+    }
     protected static void appendProperties(AbstractConfig config) {
 
         if (config == null) {

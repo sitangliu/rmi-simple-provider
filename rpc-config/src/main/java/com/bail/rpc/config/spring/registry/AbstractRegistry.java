@@ -9,7 +9,7 @@ import java.io.File;
  * @author: ext.liukai3
  * @date: 2022/2/16 20:14
  */
-public abstract class AbstractRegistry implements Registry{
+public abstract class AbstractRegistry<T> implements Registry{
 
     private URL registryUrl;
 

@@ -3,6 +3,7 @@ package com.bail.rpc.config.spring.support;
 import com.bail.rpc.config.spring.common.Constants;
 import com.bail.rpc.config.spring.common.URL;
 import com.bail.rpc.config.spring.proxy.Invoker;
+import com.bail.rpc.config.spring.registry.RegistryDirectory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -57,5 +58,16 @@ public class ProviderConsumerRegTable {
         }
 
         return null;
+    }
+
+    public static <T> void registerConsmer(Invoker<T> invoker, URL registryUrl, URL consumerUrl, RegistryDirectory<T> registryDirectory) {
+        ConsumerInvokerWrapper<T> wrapperInvoker = new ConsumerInvokerWrapper<>(invoker, registryUrl, consumerUrl, registryDirectory);
+        String serviceUniqueName = consumerUrl.getServiceKey();
+        Set<ConsumerInvokerWrapper> invokers = consumerInvokers.get(serviceUniqueName);
+        if (invokers == null) {
+            consumerInvokers.putIfAbsent(serviceUniqueName, new HashSet<ConsumerInvokerWrapper>());
+            invokers = consumerInvokers.get(serviceUniqueName);
+        }
+        invokers.add(wrapperInvoker);
     }
 }

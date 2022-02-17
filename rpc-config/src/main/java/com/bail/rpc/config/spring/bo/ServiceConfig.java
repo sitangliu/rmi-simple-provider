@@ -32,7 +32,7 @@ import static com.bail.rpc.config.spring.common.NetUtils.LOCALHOST;
 public class ServiceConfig<T> extends AbstractServiceConfig{
 
     private T ref;
-
+    private String interfaceName;
     private Class<?> interfaceClass;
 
     private ProxyFactory proxyFactory = new JdkProxyFactory();
@@ -124,93 +124,26 @@ public class ServiceConfig<T> extends AbstractServiceConfig{
         //生成本地服务代理类及其调用者
     }
 
-    private List<URL> loadRegistries(boolean provider) {
-        List<URL> registryList = new ArrayList<URL>();
-        if(registries != null && registries.size() > 0){
-            for(RegistryConfig config: registries){
-                String address = config.getAddress();
-                if (address == null || address.length() == 0) {
-                    address = Constants.ANYHOST_VALUE;
-                }
-                //系统属性配置注册中心
-                String sysaddress = System.getProperty("bail.registry.address");
-                if (sysaddress != null && sysaddress.length() > 0) {
-                    address = sysaddress;
-                }
-                if (address != null && address.length() > 0
-                        && !RegistryConfig.NO_AVAILABLE.equalsIgnoreCase(address)) {
 
-                    Map<String, String> map = new HashMap<String, String>();
-                    appendParameters(map,application);
-                    appendParameters(map,config);
-                    map.put("path", RegistryService.class.getName());
-                    map.put(Constants.TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
-                    if (!map.containsKey("protocol")) {
-                        map.put("protocol", "bail");
-                    }
 
-                    List<URL> urls = UrlUtils.parseURLs(address, map);
-                    for (URL url : urls) {
-                        url = url.addParameter(Constants.REGISTER_KEY,url.getProtocol());
-                        url = url.setProtocol(Constants.REGISTRY_PROTOCOL);
-                        registryList.add(url);
-                    }
-                }
+
+    public Class<?> getInterfaceClass() {
+        if (interfaceClass != null) {
+            return interfaceClass;
+        }
+        if (ref instanceof GenericService) {
+            return GenericService.class;
+        }
+        try {
+            if (interfaceName != null && interfaceName.length() > 0) {
+                this.interfaceClass = Class.forName(interfaceName, true, Thread.currentThread()
+                        .getContextClassLoader());
             }
+        } catch (ClassNotFoundException t) {
+            throw new IllegalStateException(t.getMessage(), t);
         }
-        return registryList;
+        return interfaceClass;
     }
-
-    private void appendParameters(Map<String, String> parameters, Object config) {
-        appendParameters(parameters,config,null);
-    }
-
-    private void appendParameters(Map<String, String> parameters, Object config, String prefix) {
-        if (config == null) {
-            return;
-        }
-        //根据方法获取需要拼接的参数
-        Method[] methods = config.getClass().getMethods();
-        for (Method method : methods) {
-            try {
-                String name = method.getName();
-                if ((name.startsWith("get") || name.startsWith("is"))
-                        && !"getClass".equals(name)
-                        && Modifier.isPublic(method.getModifiers())
-                        && method.getParameterTypes().length == 0
-                        && isPrimitive(method.getReturnType())){
-                    int i = name.startsWith("get") ? 3 : 2;
-                    String prop = StringUtils.camelToSplitName(name.substring(i, i + 1).toLowerCase() + name.substring(i + 1), ".");
-                    String key = prop;
-
-                    Object value = method.invoke(config, new Object[0]);
-                    String str = String.valueOf(value).trim();
-                    if (value != null && str.length() > 0) {
-                        if (prefix != null && prefix.length() > 0) {
-                            key = prefix + "." + key;
-                        }
-                        parameters.put(key, str);
-                    }
-                }else if("getParameters".equals(name)
-                            && Modifier.isPublic(method.getModifiers())
-                            && method.getParameterTypes().length == 0
-                            && method.getReturnType() == Map.class){
-                    Map<String, String> map = (Map<String, String>) method.invoke(config, new Object[0]);
-                    if (map != null && map.size() > 0) {
-                        String pre = (prefix != null && prefix.length() > 0 ? prefix + "." : "");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            parameters.put(pre + entry.getKey().replace('-', '.'), entry.getValue());
-                        }
-                    }
-                }
-            }catch (Exception e){
-
-            }
-
-
-        }
-    }
-
 
     private static boolean isPrimitive(Class<?> type) {
         return type.isPrimitive()

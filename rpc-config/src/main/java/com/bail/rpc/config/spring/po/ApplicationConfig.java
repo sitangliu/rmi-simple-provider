@@ -1,5 +1,7 @@
 package com.bail.rpc.config.spring.po;
 
+import java.util.List;
+
 /**
  * @Description：应用配置
  * @author: ext.liukai3
@@ -22,6 +24,9 @@ public class ApplicationConfig extends AbstractConfig{
      */
     private String version;
 
+
+    private List<RegistryConfig> registries;
+
     public String getName() {
         return name;
     }
@@ -36,5 +41,13 @@ public class ApplicationConfig extends AbstractConfig{
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public List<RegistryConfig> getRegistries() {
+        return registries;
+    }
+
+    public void setRegistries(List<RegistryConfig> registries) {
+        this.registries = registries;
     }
 }

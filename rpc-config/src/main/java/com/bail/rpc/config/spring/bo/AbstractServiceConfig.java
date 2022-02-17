@@ -1,5 +1,6 @@
 package com.bail.rpc.config.spring.bo;
 
+import com.bail.rpc.config.spring.consumer.AbstractInterfaceConfig;
 import com.bail.rpc.config.spring.po.ProtocolConfig;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * @author: ext.liukai3
  * @date: 2022/1/21 15:18
  */
-public abstract class AbstractServiceConfig extends AbstractInterfaceConfig{
+public abstract class AbstractServiceConfig extends AbstractInterfaceConfig {
 
     /**
      * 序列化默认值

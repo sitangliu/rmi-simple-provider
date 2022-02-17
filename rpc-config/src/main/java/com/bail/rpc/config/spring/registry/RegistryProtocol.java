@@ -1,6 +1,8 @@
 package com.bail.rpc.config.spring.registry;
 
+import com.bail.rpc.config.spring.cluster.Cluster;
 import com.bail.rpc.config.spring.common.Constants;
+import com.bail.rpc.config.spring.common.StringUtils;
 import com.bail.rpc.config.spring.common.URL;
 import com.bail.rpc.config.spring.exception.RpcException;
 import com.bail.rpc.config.spring.exporter.Exporter;
@@ -9,12 +11,15 @@ import com.bail.rpc.config.spring.protocol.BailProtocol;
 import com.bail.rpc.config.spring.protocol.Protocol;
 import com.bail.rpc.config.spring.proxy.Invoker;
 import com.bail.rpc.config.spring.proxy.InvokerWrapper;
+import com.bail.rpc.config.spring.proxy.JdkProxyFactory;
+import com.bail.rpc.config.spring.proxy.ProxyFactory;
 import com.bail.rpc.config.spring.support.ProviderConsumerRegTable;
 import com.bail.rpc.config.spring.zookeeper.CuratorZookeeperTransporter;
 import com.bail.rpc.config.spring.zookeeper.ZookeeperRegistry;
 import com.bail.rpc.config.spring.zookeeper.ZookeeperTransporter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +44,10 @@ public class RegistryProtocol implements Protocol {
     private Protocol  bailProtocol= new BailProtocol();
 
     private Registry registry;
+
+    private Cluster cluster;
+
+    private ProxyFactory proxyFactory = new JdkProxyFactory();
 
     @Override
     public int getDefaultPort() {
@@ -150,7 +159,44 @@ public class RegistryProtocol implements Protocol {
 
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
-        return null;
+        url = url.setProtocol(url.getParameter(Constants.REGISTRY_KEY, Constants.DEFAULT_REGISTRY)).removeParameter(Constants.REGISTRY_KEY);
+        ZookeeperTransporter zookeeperTransporter = new CuratorZookeeperTransporter();
+        Registry registry = new ZookeeperRegistry(url,zookeeperTransporter);
+        if (RegistryService.class.equals(type)) {
+            return proxyFactory.getInvoker((T) registry, type, url);
+        }
+
+        Map<String, String> qs = StringUtils.parseQueryString(url.getParameterAndDecoded(Constants.REFER_KEY));
+        String group = qs.get(Constants.GROUP_KEY);
+//        if (group != null && group.length() > 0) {
+//            if ((Constants.COMMA_SPLIT_PATTERN.split(group)).length > 1
+//                    || "*".equals(group)) {
+//                return doRefer(getMergeableCluster(), registry, type, url);
+//            }
+//        }
+        return doRefer(cluster,registry,type,url);
+    }
+
+    private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
+
+        RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
+        directory.setRegistry(registry);
+        //设置远程访问协议
+        directory.setProtocol(new BailProtocol());
+        Map<String, String> parameters = new HashMap<String, String>(directory.getUrl().getParameters());
+        URL subscribeUrl = new URL(Constants.CONSUMER_PROTOCOL, parameters.remove(Constants.REGISTER_IP_KEY), 0, type.getName(), parameters);
+        if (!Constants.ANY_VALUE.equals(url.getServiceInterface())
+                && url.getParameter(Constants.REGISTER_KEY, true)) {
+            registry.register(subscribeUrl.addParameters(Constants.CATEGORY_KEY, Constants.CONSUMERS_CATEGORY,
+                    Constants.CHECK_KEY, String.valueOf(false)));
+        }
+//        directory.subscribe(subscribeUrl.addParameter(Constants.CATEGORY_KEY,
+//                Constants.PROVIDERS_CATEGORY
+//                        + "," + Constants.CONFIGURATORS_CATEGORY
+//                        + "," + Constants.ROUTERS_CATEGORY));
+        Invoker<T> invoker = cluster.join(directory);
+        ProviderConsumerRegTable.registerConsmer(invoker,url,subscribeUrl,directory);
+        return invoker;
     }
 
     @Override
