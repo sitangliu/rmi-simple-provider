@@ -12,6 +12,10 @@ import com.bail.rpc.config.spring.proxy.Invoker;
  */
 public class BailProtocol implements Protocol{
     //对外发布通信协议
+    public static final String NAME = "bail";
+    public static final int DEFAULT_PORT = 20880;
+
+    private static BailProtocol INSTANCE;
 
     @Override
     public int getDefaultPort() {
@@ -24,7 +28,8 @@ public class BailProtocol implements Protocol{
     }
 
     @Override
-    public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+    public <T> Invoker<T> refer(Class<T> serviceType, URL url) throws RpcException {
+
         return null;
     }
 
